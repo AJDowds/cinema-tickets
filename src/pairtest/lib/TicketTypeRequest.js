@@ -6,12 +6,12 @@ export default class TicketTypeRequest {
   #ticketType;
   #noOfTickets;
 
-  #TicketTypes = ["ADULT", "CHILD", "INFANT"];
-  #TicketPrices = {
+  #TicketTypes = Object.freeze(["ADULT", "CHILD", "INFANT"]);
+  #TicketPrices = Object.freeze({
     ADULT: 25,
     CHILD: 15,
     INFANT: 0,
-  };
+  });
 
   constructor(ticketType, noOfTickets) {
     if (!this.#TicketTypes.includes(ticketType)) {
@@ -28,6 +28,8 @@ export default class TicketTypeRequest {
 
     this.#ticketType = ticketType;
     this.#noOfTickets = noOfTickets;
+
+    Object.freeze(this);
   }
 
   getNoOfTickets() {
