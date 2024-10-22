@@ -1,8 +1,10 @@
 {
-    "compilerOptions": {
-      "target": "es6",                  // Adjust the target as per your needs
-      "module": "commonjs",             // Or "esnext" depending on your module system
-      "checkJs": true                   // Enable type checking in JavaScript files
-    },
-    "include": ["src/**/*"]             // Adjust path to your source folder
-  }
+  "compilerOptions": {
+    "target": "es2020",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "checkJs": true,
+    "allowSyntheticDefaultImports": true
+  },
+  "include": ["src/**/*"]
+}
