@@ -45,8 +45,6 @@ export default class TicketService {
     };
   }
   purchaseTickets(accountId, ...ticketTypeRequests) {
-    console.log("!!accountId", accountId);
-    console.log("!!ticketTypeRequests", ticketTypeRequests);
     const receipt = this.createReceipt(accountId, ticketTypeRequests);
 
     return receipt;

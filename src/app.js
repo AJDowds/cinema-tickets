@@ -14,8 +14,6 @@ try {
     childTickets,
     infantTickets
   );
-
-  console.log("!!result", result);
 } catch (error) {
   console.error(error.message);
 }
