@@ -1,5 +1,6 @@
 import TicketTypeRequest from "../src/pairtest/lib/TicketTypeRequest.js";
 import TicketService from "../src/pairtest/TicketService.js";
+import TicketPaymentService from "../src/thirdparty/paymentgateway/TicketPaymentService.js";
 import SeatReservationService from "../src/thirdparty/seatbooking/SeatReservationService.js";
 
 test("Receipt contains the correct account ID", () => {
@@ -106,4 +107,19 @@ test("Infant not allocated a seat", () => {
   );
   ticketService.purchaseTickets(12345, adultTicket, childTicket, infantTicket);
   expect(seatReservationServiceSpy).toHaveBeenCalledWith(12345, 2);
+});
+
+test("Correct payment made", () => {
+  const adultTicket = new TicketTypeRequest("ADULT", 1);
+  const childTicket = new TicketTypeRequest("CHILD", 1);
+  const infantTicket = new TicketTypeRequest("INFANT", 1);
+
+  const ticketService = new TicketService();
+
+  const ticketPaymentServiceSpy = jest.spyOn(
+    TicketPaymentService.prototype,
+    "makePayment"
+  );
+  ticketService.purchaseTickets(12345, adultTicket, childTicket, infantTicket);
+  expect(ticketPaymentServiceSpy).toHaveBeenCalledWith(12345, 40);
 });
