@@ -48,7 +48,7 @@ export default class TicketService {
   }
 
   checkPurchaseValidity(ticketTypeRequests) {
-    const totals = ticketTypeRequests.reduce(
+    const ticketCounts = ticketTypeRequests.reduce(
       (total, ticketTypeRequest) => {
         const ticketType = ticketTypeRequest.getTicketType();
         const noOfTickets = ticketTypeRequest.getNoOfTickets();
@@ -61,17 +61,17 @@ export default class TicketService {
       { total: 0, ADULT: 0, CHILD: 0, INFANT: 0 }
     );
 
-    if (totals.total > 25) {
+    if (ticketCounts.total > 25) {
       throw new InvalidPurchaseException(
         "Cannot purchase more than 25 tickets"
       );
     }
 
-    if (!totals.ADULT) {
+    if (!ticketCounts.ADULT) {
       throw new InvalidPurchaseException("There must be an accompanying adult");
     }
 
-    if (totals.ADULT < totals.INFANT) {
+    if (ticketCounts.ADULT < ticketCounts.INFANT) {
       throw new InvalidPurchaseException(
         "There must an adult for each infant travelling"
       );
