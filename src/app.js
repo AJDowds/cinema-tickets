@@ -5,14 +5,14 @@ const ticketService = new TicketService();
 
 const adultTickets = new TicketTypeRequest("ADULT", 2);
 const childTickets = new TicketTypeRequest("CHILD", 2);
-const infactTickets = new TicketTypeRequest("INFANT", 2);
+const infantTickets = new TicketTypeRequest("INFANT", 2);
 
 try {
   const result = ticketService.purchaseTickets(
     12345,
     adultTickets,
     childTickets,
-    infactTickets
+    infantTickets
   );
 
   console.log("!!result", result);
