@@ -1,3 +1,5 @@
+import TicketTypes from "./enums/TicketTypes.js";
+
 /**
  * Immutable Object.
  */
@@ -6,24 +8,21 @@ export default class TicketTypeRequest {
   #ticketType;
   #noOfTickets;
 
-  #TicketTypes = Object.freeze(["ADULT", "CHILD", "INFANT"]);
-  #TicketPrices = Object.freeze({
-    ADULT: 25,
-    CHILD: 15,
-    INFANT: 0,
-  });
-
   constructor(ticketType, noOfTickets) {
-    if (!this.#TicketTypes.includes(ticketType)) {
+    if (!TicketTypes.includes(ticketType)) {
       throw new TypeError(
-        `type must be ${this.#TicketTypes
-          .slice(0, -1)
-          .join(", ")}, or ${this.#TicketTypes.slice(-1)}`
+        `type must be ${TicketTypes.slice(0, -1).join(
+          ", "
+        )}, or ${TicketTypes.slice(-1)}`
       );
     }
 
     if (!Number.isInteger(noOfTickets)) {
       throw new TypeError("noOfTickets must be an integer");
+    }
+
+    if (noOfTickets < 1) {
+      throw new TypeError("noOfTickets must be a positive number");
     }
 
     this.#ticketType = ticketType;
