@@ -1,4 +1,6 @@
 import TicketPrices from "./lib/enums/TicketPrices.js";
+import InvalidPurchaseException from "./lib/InvalidPurchaseException.js";
+
 export default class TicketService {
   /**
    * Should only have private methods other than the one below.
@@ -44,11 +46,46 @@ export default class TicketService {
       total,
     };
   }
+
+  checkPurchaseValidity(ticketTypeRequests) {
+    const totals = ticketTypeRequests.reduce(
+      (total, ticketTypeRequest) => {
+        const ticketType = ticketTypeRequest.getTicketType();
+        const noOfTickets = ticketTypeRequest.getNoOfTickets();
+
+        total.total += noOfTickets;
+        total[ticketType] += noOfTickets;
+
+        return total;
+      },
+      { total: 0, ADULT: 0, CHILD: 0, INFANT: 0 }
+    );
+
+    if (totals.total > 25) {
+      throw new InvalidPurchaseException(
+        "Cannot purchase more than 25 tickets"
+      );
+    }
+
+    if (!totals.ADULT) {
+      throw new InvalidPurchaseException("There must be an accompanying adult");
+    }
+
+    if (totals.ADULT < totals.INFANT) {
+      throw new InvalidPurchaseException(
+        "There must an adult for each infant travelling"
+      );
+    }
+  }
+
+  //TODO
+  reserveSeats(ticketTypeRequests) {}
+
   purchaseTickets(accountId, ...ticketTypeRequests) {
+    this.checkPurchaseValidity(ticketTypeRequests);
+
     const receipt = this.createReceipt(accountId, ticketTypeRequests);
 
     return receipt;
-
-    // throws InvalidPurchaseException
   }
 }
