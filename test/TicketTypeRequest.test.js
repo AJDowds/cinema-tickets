@@ -34,3 +34,23 @@ test("Throws error if noOfTickets is not an integer", () => {
     new TicketTypeRequest("ADULT", "two");
   }).toThrow("noOfTickets must be an integer");
 });
+
+test("Throws error if noOfTickets is not a positive number", () => {
+  expect(() => {
+    new TicketTypeRequest("ADULT", 0);
+  }).toThrow("noOfTickets must be a positive number");
+
+  expect(() => {
+    new TicketTypeRequest("ADULT", -1);
+  }).toThrow("noOfTickets must be a positive number");
+});
+
+test("TicketTypeRequest is immutable after creation", () => {
+  const tickets = new TicketTypeRequest("ADULT", 2);
+
+  expect(() => {
+    tickets.getNoOfTickets = () => 5;
+  }).toThrow();
+
+  expect(tickets.getNoOfTickets()).toBe(2);
+});
