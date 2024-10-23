@@ -6,39 +6,38 @@ export default class TicketService {
    * Should only have private methods other than the one below.
    */
 
-  calculateTotalCost(ticketTypeRequests) {
-    return ticketTypeRequests.reduce((total, ticketTypeRequest) => {
+  calculateTicketCounts(ticketTypeRequests) {
+    return ticketTypeRequests.reduce(
+      (result, ticketTypeRequest) => {
       const ticketType = ticketTypeRequest.getTicketType();
       const noOfTickets = ticketTypeRequest.getNoOfTickets();
-      return total + TicketPrices[ticketType] * noOfTickets;
-    }, 0);
+
+        result.total += noOfTickets;
+
+        if (!result[ticketType]) {
+          result[ticketType] = 0;
+        }
+
+        result[ticketType] += noOfTickets;
+
+        return result;
+      },
+      { total: 0 }
+    );
   }
 
   createReceipt(accountId, ticketTypeRequests) {
-    const breakdown = {
-      adult: 0,
-      child: 0,
-      infant: 0,
-    };
+    const ticketCounts = this.calculateTicketCounts(ticketTypeRequests);
 
-    ticketTypeRequests.forEach((ticketTypeRequest) => {
-      const ticketType = ticketTypeRequest.getTicketType();
-      const noOfTickets = ticketTypeRequest.getNoOfTickets();
-
-      switch (ticketType) {
-        case "ADULT":
-          breakdown.adult += noOfTickets * TicketPrices.ADULT;
-          break;
-        case "CHILD":
-          breakdown.child += noOfTickets * TicketPrices.CHILD;
-          break;
-        case "INFANT":
-          breakdown.infant += noOfTickets * TicketPrices.INFANT;
-          break;
-      }
-    });
-
-    const total = this.calculateTotalCost(ticketTypeRequests);
+    let total = 0;
+    const breakdown = Object.keys(ticketCounts)
+      .filter((type) => type !== "total")
+      .reduce((result, type) => {
+        const cost = ticketCounts[type] * TicketPrices[type];
+        result[type] = cost;
+        total += cost;
+        return result;
+      }, {});
 
     return {
       accountId,
@@ -48,18 +47,17 @@ export default class TicketService {
   }
 
   checkPurchaseValidity(ticketTypeRequests) {
-    const ticketCounts = ticketTypeRequests.reduce(
-      (total, ticketTypeRequest) => {
-        const ticketType = ticketTypeRequest.getTicketType();
-        const noOfTickets = ticketTypeRequest.getNoOfTickets();
+    if (ticketTypeRequests.length === 0) {
+      throw new InvalidPurchaseException("No ticket requests provided.");
+    }
 
-        total.total += noOfTickets;
-        total[ticketType] += noOfTickets;
+    const ticketCounts = this.calculateTicketCounts(ticketTypeRequests);
 
-        return total;
-      },
-      { total: 0, ADULT: 0, CHILD: 0, INFANT: 0 }
-    );
+    if (ticketCounts.total < 1) {
+      throw new InvalidPurchaseException(
+        "At least one ticket must be purchased."
+      );
+    }
 
     if (ticketCounts.total > 25) {
       throw new InvalidPurchaseException(

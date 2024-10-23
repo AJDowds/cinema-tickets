@@ -2,13 +2,6 @@ import TicketTypeRequest from "../src/pairtest/lib/TicketTypeRequest.js";
 import TicketService from "../src/pairtest/TicketService.js";
 import SeatReservationService from "../src/thirdparty/seatbooking/SeatReservationService.js";
 
-// Potential shape of receipt that will be created by purchaseTickets
-// {
-//   accountId: number,
-//   breakdown: { adult: number, child: number, infant: number },
-//   total: number
-// }
-
 test("Receipt contains the correct account ID", () => {
   const adultTicket = new TicketTypeRequest("ADULT", 1);
 
@@ -33,9 +26,9 @@ test("Single ticket costs are correct", () => {
     infantTicket
   );
 
-  expect(result.breakdown.adult).toBe(25);
-  expect(result.breakdown.child).toBe(15);
-  expect(result.breakdown.infant).toBe(0);
+  expect(result.breakdown.ADULT).toBe(25);
+  expect(result.breakdown.CHILD).toBe(15);
+  expect(result.breakdown.INFANT).toBe(0);
 });
 
 test("Total cost is correct", () => {
@@ -75,6 +68,14 @@ test("There must an adult for each infant travelling", () => {
   expect(() => {
     ticketService.purchaseTickets(12345, adultTicket, infantTicket);
   }).toThrow("There must an adult for each infant travelling");
+});
+
+test("No ticket requetes provided", () => {
+  const ticketService = new TicketService();
+
+  expect(() => {
+    ticketService.purchaseTickets(12345);
+  }).toThrow("No ticket requests provided.");
 });
 
 test("Maximum of 25 tickets can be purchased", () => {
