@@ -1,3 +1,4 @@
+import TicketPaymentService from "../thirdparty/paymentgateway/TicketPaymentService.js";
 import SeatReservationService from "../thirdparty/seatbooking/SeatReservationService.js";
 import TicketPrices from "./lib/enums/TicketPrices.js";
 import InvalidPurchaseException from "./lib/InvalidPurchaseException.js";
@@ -10,8 +11,8 @@ export default class TicketService {
   calculateTicketCounts(ticketTypeRequests) {
     return ticketTypeRequests.reduce(
       (result, ticketTypeRequest) => {
-      const ticketType = ticketTypeRequest.getTicketType();
-      const noOfTickets = ticketTypeRequest.getNoOfTickets();
+        const ticketType = ticketTypeRequest.getTicketType();
+        const noOfTickets = ticketTypeRequest.getNoOfTickets();
 
         result.total += noOfTickets;
 
@@ -85,12 +86,19 @@ export default class TicketService {
     seatReservationService.reserveSeat(accountId, nonInfantSeatsTotal);
   }
 
+  makePayment(accountId, total) {
+    const ticketPaymentService = new TicketPaymentService();
+    ticketPaymentService.makePayment(accountId, total);
+  }
+
   purchaseTickets(accountId, ...ticketTypeRequests) {
     this.checkPurchaseValidity(ticketTypeRequests);
 
     this.reserveSeats(accountId, ticketTypeRequests);
 
     const receipt = this.createReceipt(accountId, ticketTypeRequests);
+
+    this.makePayment(accountId, receipt.total);
 
     return receipt;
   }
