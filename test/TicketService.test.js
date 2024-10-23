@@ -61,15 +61,31 @@ test("Child and infant tickets require an adult", () => {
 
   expect(() => {
     ticketService.purchaseTickets(12345, childTicket, infantTicket);
-  }).toThrow("Child and infant tickets cannot be purchased without an adult");
+  }).toThrow("There must be an accompanying adult");
 });
 
-test("Maximum of 25 tickets can be purchased", () => {
-  const adultTicket = new TicketTypeRequest("ADULT", 26);
+test("There must an adult for each infant travelling", () => {
+  const adultTicket = new TicketTypeRequest("ADULT", 1);
+  const infantTicket = new TicketTypeRequest("INFANT", 2);
 
   const ticketService = new TicketService();
 
   expect(() => {
-    ticketService.purchaseTickets(12345, adultTicket);
+    ticketService.purchaseTickets(12345, adultTicket, infantTicket);
+  }).toThrow("There must an adult for each infant travelling");
+});
+
+test("Maximum of 25 tickets can be purchased", () => {
+  const maximumAccepted = new TicketTypeRequest("ADULT", 25);
+  const maximumExceeded = new TicketTypeRequest("ADULT", 26);
+
+  const ticketService = new TicketService();
+
+  expect(() => {
+    ticketService.purchaseTickets(12345, maximumAccepted);
+  }).not.toThrow();
+
+  expect(() => {
+    ticketService.purchaseTickets(12345, maximumExceeded);
   }).toThrow("Cannot purchase more than 25 tickets");
 });
