@@ -1,3 +1,4 @@
+import SeatReservationService from "../thirdparty/seatbooking/SeatReservationService.js";
 import TicketPrices from "./lib/enums/TicketPrices.js";
 import InvalidPurchaseException from "./lib/InvalidPurchaseException.js";
 
@@ -76,11 +77,18 @@ export default class TicketService {
     }
   }
 
-  //TODO
-  reserveSeats(ticketTypeRequests) {}
+  reserveSeats(accountId, ticketTypeRequests) {
+    const ticketCounts = this.calculateTicketCounts(ticketTypeRequests);
+    const nonInfantSeatsTotal = ticketCounts.total - (ticketCounts.INFANT || 0);
+
+    const seatReservationService = new SeatReservationService();
+    seatReservationService.reserveSeat(accountId, nonInfantSeatsTotal);
+  }
 
   purchaseTickets(accountId, ...ticketTypeRequests) {
     this.checkPurchaseValidity(ticketTypeRequests);
+
+    this.reserveSeats(accountId, ticketTypeRequests);
 
     const receipt = this.createReceipt(accountId, ticketTypeRequests);
 
