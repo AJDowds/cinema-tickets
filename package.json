@@ -2,14 +2,11 @@
   "name": "cinema-tickets-javascript",
   "description": "This is a coding exercise which will allow you to demonstrate how you code and your approach to a given problem.",
   "version": "1.0.1",
-  "main": "src/app.js",
   "engines": {
     "node": ">=20.9.0"
   },
   "type": "module",
   "scripts": {
-    "start": "node src/app.js",
-    "dev": "nodemon src/app.js",
     "test": "jest",
     "lint": "eslint ."
   },
