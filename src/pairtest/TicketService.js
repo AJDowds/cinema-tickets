@@ -8,7 +8,7 @@ export default class TicketService {
    * Should only have private methods other than the one below.
    */
 
-  calculateTicketCounts(ticketTypeRequests) {
+  #calculateTicketCounts(ticketTypeRequests) {
     return ticketTypeRequests.reduce(
       (result, ticketTypeRequest) => {
         const ticketType = ticketTypeRequest.getTicketType();
@@ -28,8 +28,8 @@ export default class TicketService {
     );
   }
 
-  createReceipt(accountId, ticketTypeRequests) {
-    const ticketCounts = this.calculateTicketCounts(ticketTypeRequests);
+  #createReceipt(accountId, ticketTypeRequests) {
+    const ticketCounts = this.#calculateTicketCounts(ticketTypeRequests);
 
     let total = 0;
     const breakdown = Object.keys(ticketCounts)
@@ -48,12 +48,12 @@ export default class TicketService {
     };
   }
 
-  checkPurchaseValidity(ticketTypeRequests) {
+  #checkPurchaseValidity(ticketTypeRequests) {
     if (ticketTypeRequests.length === 0) {
       throw new InvalidPurchaseException("No ticket requests provided.");
     }
 
-    const ticketCounts = this.calculateTicketCounts(ticketTypeRequests);
+    const ticketCounts = this.#calculateTicketCounts(ticketTypeRequests);
 
     if (ticketCounts.total < 1) {
       throw new InvalidPurchaseException(
@@ -78,27 +78,27 @@ export default class TicketService {
     }
   }
 
-  reserveSeats(accountId, ticketTypeRequests) {
-    const ticketCounts = this.calculateTicketCounts(ticketTypeRequests);
+  #reserveSeats(accountId, ticketTypeRequests) {
+    const ticketCounts = this.#calculateTicketCounts(ticketTypeRequests);
     const nonInfantSeatsTotal = ticketCounts.total - (ticketCounts.INFANT || 0);
 
     const seatReservationService = new SeatReservationService();
     seatReservationService.reserveSeat(accountId, nonInfantSeatsTotal);
   }
 
-  makePayment(accountId, total) {
+  #makePayment(accountId, total) {
     const ticketPaymentService = new TicketPaymentService();
     ticketPaymentService.makePayment(accountId, total);
   }
 
   purchaseTickets(accountId, ...ticketTypeRequests) {
-    this.checkPurchaseValidity(ticketTypeRequests);
+    this.#checkPurchaseValidity(ticketTypeRequests);
 
-    this.reserveSeats(accountId, ticketTypeRequests);
+    this.#reserveSeats(accountId, ticketTypeRequests);
 
-    const receipt = this.createReceipt(accountId, ticketTypeRequests);
+    const receipt = this.#createReceipt(accountId, ticketTypeRequests);
 
-    this.makePayment(accountId, receipt.total);
+    this.#makePayment(accountId, receipt.total);
 
     return receipt;
   }
